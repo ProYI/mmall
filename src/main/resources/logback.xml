@@ -1,0 +1,94 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!-- sacn开启logback扫描 scanPeriod扫描时间间隔 debug是是否打印logback内容的日志信息，不关注logback的运行状况可以不用打开-->
+<configuration scan="true" scanPeriod="60 seconds" debug="false">
+
+    <!--定义参数常量-->
+    <!--trace<debug<info<warn<error
+        logger.trace("msg") logger.debug... logback的内部实现是logger对象记录相应级别日志
+    -->
+    <property name="log.level" value="debug"/>
+    <!--日志文件保留数量-->
+    <property name="log.maxHistory" value="30"/>
+    <!--日志输出路径-->
+    <property name="log.filePath" value="${catalina.base}/logs/webapps"/>
+    <!--日志输出格式
+    %d日期格式 [线程情况] %之后5个位置来显示日志级别 出现问题的哪个pattern的哪个类 问题详细信息 %n换行-->
+    <property name="log.pattern" value="%d{yyyy-MM-dd HH:mm:ss.SSS} [%thread] %-5level %logger{50} - %msg%n"/>
+    <!-- 日志输出位置 -->
+    <!-- 控制台设置 -->
+    <appender name="consoleAppender" class="ch.qos.logback.core.ConsoleAppender">
+        <!-- encoder负责将日志事件转换成字符串，并输出到相应的文件中-->
+        <encoder>
+            <pattern>${log.pattern}</pattern>
+        </encoder>
+    </appender>
+    <!-- DEBUG -->
+    <!-- RollingFileAppender滚动式生成日志文件 可以按照文件大小或固定时间生成新的日志文件-->
+    <appender name="debugAppender" class="ch.qos.logback.core.rolling.RollingFileAppender">
+        <!-- 文件路径 -->
+        <file>${log.filePath}/debug.log</file>
+        <!-- 此处设置按时间生成-->
+        <rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
+            <!-- 文件名称 -->
+            <fileNamePattern>${log.filePath}/debug/debug.%d{yyyy-MM-dd}.log.gz</fileNamePattern>
+            <!-- 文件最大保存历史数量 -->
+            <maxHistory>${log.maxHistory}</maxHistory>
+        </rollingPolicy>
+        <encoder>
+            <pattern>${log.pattern}</pattern>
+        </encoder>
+        <!--只记录dubug级别信息-->
+        <filter class="ch.qos.logback.classic.filter.LevelFilter">
+            <level>DEBUG</level>
+            <onMatch>ACCEPT</onMatch>
+            <!-- 如果不是dubug级别就过滤掉-->
+            <onMismatch>DENY</onMismatch>
+        </filter>
+    </appender>
+    <!-- INFO -->
+    <appender name="infoAppender" class="ch.qos.logback.core.rolling.RollingFileAppender">
+        <file>${log.filePath}/info.log</file>
+        <rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
+            <fileNamePattern>${log.filePath}/info/info.%d{yyyy-MM-dd}.log.gz</fileNamePattern>
+            <maxHistory>${log.maxHistory}</maxHistory>
+        </rollingPolicy>
+        <encoder>
+            <pattern>${log.pattern}</pattern>
+        </encoder>
+        <filter class="ch.qos.logback.classic.filter.LevelFilter">
+            <level>INFO</level>
+            <onMatch>ACCEPT</onMatch>
+            <onMismatch>DENY</onMismatch>
+        </filter>
+    </appender>
+    <!-- ERROR -->
+    <appender name="errorAppender" class="ch.qos.logback.core.rolling.RollingFileAppender">
+        <file>${log.filePath}/error.log</file>
+        <rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
+            <fileNamePattern>${log.filePath}/error/error.%d{yyyy-MM-dd}.log.gz</fileNamePattern>
+            <maxHistory>${log.maxHistory}</maxHistory>
+        </rollingPolicy>
+        <encoder>
+            <pattern>${log.pattern}</pattern>
+        </encoder>
+        <filter class="ch.qos.logback.classic.filter.LevelFilter">
+            <level>ERROR</level>
+            <onMatch>ACCEPT</onMatch>
+            <onMismatch>DENY</onMismatch>
+        </filter>
+    </appender>
+    <!--logger 存放日志对象，同时告知logback感知哪个package下的信息 level：哪个级别以上的信息
+
+        additivity属性会去父类logger下继承其处理方式，即root下的处理方式，并在父类的处理方式中输出日志结果
+        例如：logger本是不在控制台输出日志信息，root在控制台输出，additivity为true后，logger就获取了root在控制台输出日志的能力
+    -->
+    <logger name="vip.proyi.mmall" level="${log.level}" additivity="true">
+        <appender-ref ref="debugAppender"/>
+        <appender-ref ref="infoAppender"/>
+        <appender-ref ref="errorAppender"/>
+    </logger>
+    <!-- root其实就是一个根logger，如果没有指定其他logger，默认加载root的处理方式 -->
+    <root level="info">
+        <appender-ref ref="consoleAppender"/>
+    </root>
+</configuration>
