@@ -11,15 +11,28 @@
         http://www.springframework.org/schema/context/spring-context-3.2.xsd">
     <!--扫描controller mvc层只负责扫描@Controller、@ControllerAdvice -->
     <!--base-package 如果多个，用“,”分隔-->
-    <context:component-scan base-package="vip.proyi.mmall" use-default-filters="false">
-        <!-- 扫描 @Controller -->
-        <context:include-filter type="annotation" expression="org.springframework.stereotype.Controller" />
-        <!-- 控制器增强，使一个Contoller成为全局的异常处理类，类中用@ExceptionHandler方法注解的方法可以处理所有Controller发生的异常 -->
-        <context:include-filter type="annotation" expression="org.springframework.web.bind.annotation.ControllerAdvice" />
-    </context:component-scan>
+    <context:component-scan base-package="vip.proyi.mmall" annotation-config="true"/>
 
     <!--1.开启SpringMVC注解模式-->
-    <mvc:annotation-driven></mvc:annotation-driven>
+    <mvc:annotation-driven>
+        <mvc:message-converters>
+            <bean class="org.springframework.http.converter.StringHttpMessageConverter">
+                <property name="supportedMediaTypes">
+                    <list>
+                        <value>text/plain;charset=UTF-8</value>
+                        <value>text/html;charset=UTF-8</value>
+                    </list>
+                </property>
+            </bean>
+            <bean class="org.springframework.http.converter.json.MappingJackson2HttpMessageConverter">
+                <property name="supportedMediaTypes">
+                    <list>
+                        <value>application/json;charset=UTF-8</value>
+                    </list>
+                </property>
+            </bean>
+        </mvc:message-converters>
+    </mvc:annotation-driven>
 
     <!--2.静态资源交给默认servlet处理 -->
     <mvc:default-servlet-handler/>
@@ -32,15 +45,15 @@
         <property name="suffix" value=".html"/>
     </bean>
 
-    <!--&lt;!&ndash;4.文件上传解析器&ndash;&gt;
+    <!--4.文件上传解析器-->
     <bean id="multipartResolver" class="org.springframework.web.multipart.commons.CommonsMultipartResolver">
-        &lt;!&ndash;文件编码&ndash;&gt;
+        <!--文件编码-->
         <property name="defaultEncoding" value="utf-8"/>
-        &lt;!&ndash;上传的最大尺寸 单位字节 设置为20M 1024*1024&ndash;&gt;
+        <!--上传的最大尺寸 单位字节 设置为20M 1024*1024-->
         <property name="maxUploadSize" value="1048576"/>
-        &lt;!&ndash;上传的最大内存&ndash;&gt;
+        <!--上传的最大内存-->
         <property name="maxInMemorySize" value="1048576"/>
-    </bean>-->
+    </bean>
 
     <!--5.权限拦截器-->
 

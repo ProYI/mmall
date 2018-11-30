@@ -75,7 +75,7 @@
         <!-- 注入sqlSessionFactory-->
         <property name="sqlSessionFactoryBeanName" value="sqlSessionFactory"/>
         <!-- 指定扫描的包名。如果扫描多个包，每个包中间使用半角逗号分隔-->
-        <property name="basePackage" value="vip.proyi.mmall.domain"/>
+        <property name="basePackage" value="vip.proyi.mmall.dao"/>
     </bean>
 
     <!-- 开启Hibernate Validator参数验证特性 -->
