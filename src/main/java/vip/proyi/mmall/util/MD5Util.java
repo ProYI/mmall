@@ -21,8 +21,9 @@ import java.security.MessageDigest;
 public class MD5Util {
     private static String byteArrayToHexString(byte b[]) {
         StringBuffer resultSb = new StringBuffer();
-        for (int i = 0; i < b.length; i++)
+        for (int i = 0; i < b.length; i++) {
             resultSb.append(byteToHexString(b[i]));
+        }
 
         return resultSb.toString();
     }
@@ -61,6 +62,7 @@ public class MD5Util {
     }
 
     public static String MD5EncodeUtf8(String origin) {
+        origin = origin + PropertiesUtil.getProperty("password.salt", "");
         return MD5Encode(origin, "utf-8");
     }
 

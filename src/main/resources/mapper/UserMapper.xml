@@ -88,7 +88,7 @@
     where id = #{id,jdbcType=INTEGER}
   </delete>
 
-    <insert id="insert" parameterType="vip.proyi.mmall.po.User">
+    <insert id="insert" parameterType="vip.proyi.mmall.pojo.User">
     insert into mmall_user (id, username, password, 
       email, phone, question, 
       answer, role, create_time, 
@@ -98,7 +98,7 @@
       #{answer,jdbcType=VARCHAR}, #{role,jdbcType=INTEGER}, #{createTime,jdbcType=TIMESTAMP}, 
       #{updateTime,jdbcType=TIMESTAMP})
   </insert>
-    <insert id="insertSelective" parameterType="vip.proyi.mmall.po.User">
+    <insert id="insertSelective" parameterType="vip.proyi.mmall.pojo.User">
         insert into mmall_user
         <trim prefix="(" suffix=")" suffixOverrides=",">
             <if test="id != null">
@@ -166,7 +166,7 @@
         </trim>
     </insert>
 
-    <update id="updateByPrimaryKeySelective" parameterType="vip.proyi.mmall.po.User">
+    <update id="updateByPrimaryKeySelective" parameterType="vip.proyi.mmall.pojo.User">
         update mmall_user
         <set>
             <if test="username != null">
@@ -194,12 +194,12 @@
                 create_time = #{createTime,jdbcType=TIMESTAMP},
             </if>
             <if test="updateTime != null">
-                update_time = #{updateTime,jdbcType=TIMESTAMP},
+                update_time = now(),
             </if>
         </set>
         where id = #{id,jdbcType=INTEGER}
     </update>
-    <update id="updateByPrimaryKey" parameterType="vip.proyi.mmall.po.User">
+    <update id="updateByPrimaryKey" parameterType="vip.proyi.mmall.pojo.User">
     update mmall_user
     set username = #{username,jdbcType=VARCHAR},
       password = #{password,jdbcType=VARCHAR},
@@ -232,5 +232,39 @@
         FROM mmall_user
         WHERE username=#{username}
         AND password=#{password}
+    </select>
+
+    <select id="selectQuestionByUsername" resultType="java.lang.String" parameterType="String">
+      select question
+      from mmall_user
+      where username=#{username}
+    </select>
+
+    <select id="checkAnswer" resultType="java.lang.Integer" parameterType="map">
+        SELECT COUNT(1)
+        FROM mmall_user
+        WHERE username=#{username}
+        AND question=#{question}
+        AND answer=#{answer}
+    </select>
+
+    <update id="updatePasswordByUsername" parameterType="map">
+        UPDATE mmall_user
+        set password=#{passwordNew}, update_time=now()
+        where username=#{username}
+    </update>
+
+    <select id="checkPassword" resultType="java.lang.Integer" parameterType="map">
+        select count(1)
+        FROM mmall_user
+        where id=#{userId}
+        and password=#{password}
+    </select>
+
+    <select id="checkEmailByUserId" resultType="java.lang.Integer" parameterType="map">
+        SELECT COUNT(1)
+        FROM mmall_user
+        WHERE email=#{email}
+        and id!=#{userId}
     </select>
 </mapper>

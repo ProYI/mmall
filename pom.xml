@@ -28,6 +28,7 @@
         <!-- logback + slf4j 日志监控版本号 -->
         <slf4j.version>1.7.25</slf4j.version>
         <logback.version>1.2.3</logback.version>
+        <logback-ext-spring.version>0.1.4</logback-ext-spring.version>
         <!-- json版本号 -->
         <fastjson.version>1.2.52</fastjson.version>
         <jackson-databind.version>2.9.5</jackson-databind.version>
@@ -41,6 +42,8 @@
         <!--commons版本号-->
         <commons-fileupload.version>1.3.3</commons-fileupload.version>
         <commons-lang3.version>3.5</commons-lang3.version>
+        <!--google guava版本号-->
+        <google.guava.version>20.0</google.guava.version>
     </properties>
 
     <dependencies>
@@ -148,6 +151,22 @@
             <artifactId>logback-core</artifactId>
             <version>${logback.version}</version>
         </dependency>
+        <dependency>
+            <groupId>org.logback-extensions</groupId>
+            <artifactId>logback-ext-spring</artifactId>
+            <version>${logback-ext-spring.version}</version>
+            <exclusions>
+                <exclusion>
+                    <artifactId>logback-classic</artifactId>
+                    <groupId>ch.qos.logback</groupId>
+                </exclusion>
+            </exclusions>
+        </dependency>
+        <dependency>
+            <groupId>ch.qos.logback</groupId>
+            <artifactId>logback-classic</artifactId>
+            <version>${logback.version}</version>
+        </dependency>
         <!--json包-->
         <dependency>
             <groupId>com.fasterxml.jackson.core</groupId>
@@ -157,11 +176,6 @@
         <dependency>
             <groupId>com.fasterxml.jackson.core</groupId>
             <artifactId>jackson-core</artifactId>
-            <version>${jackson-databind.version}</version>
-        </dependency>
-        <dependency>
-            <groupId>com.fasterxml.jackson.core</groupId>
-            <artifactId>jackson-annotations</artifactId>
             <version>${jackson-databind.version}</version>
         </dependency>
         <!--hibernate-validator 实现数据校验-->
@@ -198,6 +212,12 @@
             <groupId>org.apache.commons</groupId>
             <artifactId>commons-lang3</artifactId>
             <version>${commons-lang3.version}</version>
+        </dependency>
+        <!-- google cache工具 -->
+        <dependency>
+            <groupId>com.google.guava</groupId>
+            <artifactId>guava</artifactId>
+            <version>${google.guava.version}</version>
         </dependency>
 
     </dependencies>
