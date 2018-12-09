@@ -44,6 +44,14 @@
         <commons-lang3.version>3.5</commons-lang3.version>
         <!--google guava版本号-->
         <google.guava.version>20.0</google.guava.version>
+        <!--日期格式化工具-->
+        <joda-time.version>2.3</joda-time.version>
+        <!--mybatis pagehelper-->
+        <pagehelper.version>4.1.0</pagehelper.version>
+        <mybatis-paginator.version>1.2.17</mybatis-paginator.version>
+        <jsqlparser.version>0.9.4</jsqlparser.version>
+        <!-- ftp client -->
+        <ftp.client.version>3.1</ftp.client.version>
     </properties>
 
     <dependencies>
@@ -219,7 +227,37 @@
             <artifactId>guava</artifactId>
             <version>${google.guava.version}</version>
         </dependency>
+        <!--日期格式化工具-->
+        <dependency>
+            <groupId>joda-time</groupId>
+            <artifactId>joda-time</artifactId>
+            <version>${joda-time.version}</version>
+        </dependency>
 
+        <!-- mybatis pager begin-->
+        <dependency>
+            <groupId>com.github.pagehelper</groupId>
+            <artifactId>pagehelper</artifactId>
+            <version>${pagehelper.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>com.github.miemiedev</groupId>
+            <artifactId>mybatis-paginator</artifactId>
+            <version>${mybatis-paginator.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>com.github.jsqlparser</groupId>
+            <artifactId>jsqlparser</artifactId>
+            <version>${jsqlparser.version}</version>
+        </dependency>
+        <!-- ftp client -->
+        <dependency>
+            <groupId>commons-net</groupId>
+            <artifactId>commons-net</artifactId>
+            <version>${ftp.client.version}</version>
+        </dependency>
+
+        <!-- mybatis pager end-->
     </dependencies>
 
     <build>

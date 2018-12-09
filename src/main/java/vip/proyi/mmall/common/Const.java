@@ -10,6 +10,10 @@
 package vip.proyi.mmall.common;
 
 
+import com.google.common.collect.Sets;
+
+import java.util.Set;
+
 /**
  * 〈常量类〉
  * @author ProYI
@@ -33,4 +37,33 @@ public class Const {
      */
     public static final String EMAIL = "email";
     public static final String USERNAME = "username";
+    /**
+     * 商品在售状态
+     */
+    public enum ProductStatusEnum {
+        ON_SALE(1, "在线");
+
+
+        private String value;
+        private int code;
+
+        ProductStatusEnum(int code, String value) {
+            this.value = value;
+            this.code = code;
+        }
+
+        public String getValue() {
+            return value;
+        }
+
+        public int getCode() {
+            return code;
+        }
+    }
+    /**
+     * 商品动态排序
+     */
+    public interface ProductListOrderBy {
+        Set<String> PRICE_ACE_DESC = Sets.newHashSet("price_desc", "price_asc");
+    }
 }
