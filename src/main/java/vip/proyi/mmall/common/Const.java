@@ -66,4 +66,19 @@ public class Const {
     public interface ProductListOrderBy {
         Set<String> PRICE_ACE_DESC = Sets.newHashSet("price_desc", "price_asc");
     }
+    /**
+     * 购物车选中状态
+     */
+    public interface Cart {
+        /**
+        * 即购物车里商品选中状态为1
+        * 未选中状态为0
+        */
+        int CHECKED = 1;
+        int UN_CHECKED = 0;
+
+        String LIMIT_NUM_FAIL = "LIMIT_NUM_FAIL";
+        String LIMIT_NUM_SUCCESS = "LIMIT_NUM_SUCCESS";
+
+    }
 }

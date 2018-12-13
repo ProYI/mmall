@@ -73,3 +73,11 @@ CREATE TABLE `mmall_product` (
   PRIMARY KEY (`id`)
 ) ENGINE=InnoDB AUTO_INCREMENT=30 DEFAULT CHARSET=utf8;
 ```  
+## 购物车模块  
+* 购物车模块的设计思想  
+* 封装一个高复用购物车核心方法  
+* 解决浮点型商业运算中丢失精度的问题
+## 收货地址模块
+* SpringMVC数据绑定中对象绑定  
+* mybatis自动生成主键、配置和使用  
+* 如何避免横向越权漏洞的巩固
