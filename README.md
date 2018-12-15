@@ -77,7 +77,38 @@ CREATE TABLE `mmall_product` (
 * 购物车模块的设计思想  
 * 封装一个高复用购物车核心方法  
 * 解决浮点型商业运算中丢失精度的问题
+```sql
+CREATE TABLE `mmall_cart` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `user_id` int(11) NOT NULL,
+  `product_id` int(11) DEFAULT NULL COMMENT '商品id',
+  `quantity` int(11) DEFAULT NULL COMMENT '数量',
+  `checked` int(11) DEFAULT NULL COMMENT '是否选择,1=已勾选,0=未勾选',
+  `create_time` datetime DEFAULT NULL COMMENT '创建时间',
+  `update_time` datetime DEFAULT NULL COMMENT '更新时间',
+  PRIMARY KEY (`id`),
+  KEY `user_id_index` (`user_id`) USING BTREE
+) ENGINE=InnoDB AUTO_INCREMENT=146 DEFAULT CHARSET=utf8;
+```
 ## 收货地址模块
 * SpringMVC数据绑定中对象绑定  
 * mybatis自动生成主键、配置和使用  
 * 如何避免横向越权漏洞的巩固
+### 收货地址表sql
+```sql
+CREATE TABLE `mmall_shipping` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `user_id` int(11) DEFAULT NULL COMMENT '用户id',
+  `receiver_name` varchar(20) DEFAULT NULL COMMENT '收货姓名',
+  `receiver_phone` varchar(20) DEFAULT NULL COMMENT '收货固定电话',
+  `receiver_mobile` varchar(20) DEFAULT NULL COMMENT '收货移动电话',
+  `receiver_province` varchar(20) DEFAULT NULL COMMENT '省份',
+  `receiver_city` varchar(20) DEFAULT NULL COMMENT '城市',
+  `receiver_district` varchar(20) DEFAULT NULL COMMENT '区/县',
+  `receiver_address` varchar(200) DEFAULT NULL COMMENT '详细地址',
+  `receiver_zip` varchar(6) DEFAULT NULL COMMENT '邮编',
+  `create_time` datetime DEFAULT NULL,
+  `update_time` datetime DEFAULT NULL,
+  PRIMARY KEY (`id`)
+) ENGINE=InnoDB AUTO_INCREMENT=33 DEFAULT CHARSET=utf8;
+```
