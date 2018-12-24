@@ -112,3 +112,100 @@ CREATE TABLE `mmall_shipping` (
   PRIMARY KEY (`id`)
 ) ENGINE=InnoDB AUTO_INCREMENT=33 DEFAULT CHARSET=utf8;
 ```
+## 支付模块
+* 熟悉支付宝对接核心文档，调通支付宝支付功能官方Demo  
+  > 1.[沙箱登录](https://openhome.alipay.com/platform/appDaily.htm?tab=tool)  
+  > 2.[沙箱环境使用说明](https://docs.open.alipay.com/200/105311/)  
+  > 3.[当面付产品介绍](https://docs.open.alipay.com/194)  
+  > 4.[扫码支付接入指引](https://docs.open.alipay.com/194/106078/)  
+  > 5.[当面付快速接入](https://docs.open.alipay.com/194/105170/)  
+  > 6.[当面付接入必读](https://docs.open.alipay.com/194/105322/)  
+  > 7.[当面付进阶功能](https://docs.open.alipay.com/194/105190/)  
+  > 8.[当面付异步通知-仅用于扫码支付](https://docs.open.alipay.com/194/103296/)  
+  > 9.[当面付SDK&Demo](https://docs.open.alipay.com/194/105201/)  
+  > 10.[生成RSA密钥](https://docs.open.alipay.com/291/105971)  
+  > 11.[线上创建应用说明](https://docs.open.alipay.com/200/105310)  
+  
+* 解析支付宝SDK对接源码  
+* RSA1和RSA2验证签名及加解密  
+* 避免支付宝重复通知和数据校验  
+* natapp外网穿透和tomcat remote debug  
+  > 1.保持远端代码版本和本地代码保持一致  
+  > 2.执行sudo vim ${tomcat}/bin/catalina.sh进行编辑  
+  > 3.添加如下配置，其中address为开放远程debug的端口号  
+  > - CATALINA_OPTS="-server -Xdebug -Xnoagent -Djava.compiler=NONE - Xrunjdwp:transport=dt_socket,server=y,suspend=n,address=5005"  
+  
+  > 4.把开放远程dubug的端口加到防火墙配置中  
+  > 5.及时关闭开放的debug端口  
+  > 6.编辑sudo vim /etc/sysconfig/iptables  
+  > 7.添加如下配置 -A INPUT -p tcp -m tcp --dport 5005 -j ACCEPT  
+  > 8.:wq保存退出  
+  > 9.重启防火墙sudo service iptables restart  
+  
+* 生成二维码，并持久化到图片服务器  
+### 支付宝扫码支付功能对接  
+* 一些重要的官方文档  
+* 沙箱调试环境（测试账号）  
+* 支付宝扫码支付主业务流程  
+  ![支付宝扫码支付主业务流程图](img_mmall/支付宝扫码支付主业务流程图.png)
+* 支付宝扫码支付流程  
+  ![支付宝扫码支付流程](img_mmall/支付宝扫码支付流程.png)
+* 支付宝扫码支付重要的字段  
+  **关键入参：**  
+    |参数名称|参数说明|  
+    |:-:|:-|  
+    |out_trade_no|商户订单号，需要保证不重复|  
+    |total_amount|订单金额|
+    |subject|订单标题|
+    |store_id|商户门店编号|
+    |timeout_express|交易超时时间|  
+  **关键出参：**  
+    |参数名称|参数说明|  
+    |:-:|:-|  
+    |qr_code|订单二维码（有效时间2小时）的内容，开发者需要自己使用工具根据内容生成二维码图片|  
+  
+  **重要字段：**  
+    |参数|参数名称|类型|必填|描述|范例|  
+    |:-:|:-:|:-:|:-:|:-:|:-:|  
+    |trade_status|交易状态|String(32)|否|交易目前所处的状态|TRADE_CLOSED|  
+    |total_amount|订单金额|Number(9,2)|否|本次交易支付的订单金额，单位为人民币（元）|20|  
+    |buyer_pay_amount|付款金额|Number(9,2)|否|用户在交易中支付的金额|13.88|  
+  **交易状态说明：**  
+    |枚举名称|枚举说明|  
+    |:-:|:-|  
+    |WAIT_BUYER_PAY|交易创建，等待买家付款|  
+    |TRADE_CLOSED|未付款交易超时关闭，或支付完成后全额退款|  
+    |TRADE_SUCCESS|交易支付成功|  
+    |TRADE_FINISHED|交易结束，不可退款|  
+  **通知触发条件：**  
+    |触发条件名|触发条件描述|触发条件默认值|  
+    |:-:|:-|:-|  
+    |TRADE_FINISHED|交易完成|false（不触发通知）|  
+    |TRADE_SUCCESS|支付成功|true（触发通知）|  
+    |WAIT_BUYER_PAY|交易创建|false（不触发通知）|  
+    |TRADE_CLOSED|交易关闭|false（不触发通知）|  
+  **支付渠道说明：**  
+    |支付渠道代码|支付渠道|  
+    |:-:|:-|  
+    |ALIPAYACCOUNT|支付宝余额|  
+* 支付宝扫码支付重要细节  
+  > 1.主动轮询和回调的区别  
+  > 2.避免单边账  
+  > 3.同步请求的加签和验证签名  
+  > 4.回调的验证（签名、金额、订单号、订单状态、交易状态、商户id）  
+  > 5.过滤掉重复的通知  
+  > 6.一定要验证并确保可接受的异步通知是支付宝发出的  
+  
+* 支付宝扫码支付对接技巧（外网联调）  
+  * 回调请求的返回  
+      ```sql
+      程序执行完后必须打印输出“success”（不包含引号）。
+      如果商户反馈给支付宝的字符不是success这7个字符，支付宝服务器会不断重发通知，直到超过24小时22分钟。
+    一般情况下，25小时以内完成8次通知（通知的间隔频率一般是：4m,10m,10m,1h,2h,6h,15h）
+      ```
+  * 路由器设置开放本地到外网（不推荐）  
+  * 外网远程dubug  
+    - 1 保持远端代码版本和本地代码保持一致  
+    - 2 及时关闭开放的dubug端口  
+  * 内网穿透（ngrok、natapp、花生壳）  
+* 支付宝扫码支付官方Demo调试   
