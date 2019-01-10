@@ -83,6 +83,7 @@ public class OrderServiceImpl implements IOrderService {
         BigDecimal payment = this.getOrderTotalPrice(orderItemList);
 
         // 生成订单
+        return null;
     }
 
     /**
