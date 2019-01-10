@@ -10,6 +10,7 @@
 package vip.proyi.mmall.service.impl;
 
 import com.alipay.api.AlipayResponse;
+import com.alipay.api.domain.Car;
 import com.alipay.api.response.AlipayTradePrecreateResponse;
 
 import com.alipay.demo.trade.config.Configs;
@@ -22,20 +23,18 @@ import com.alipay.demo.trade.service.impl.AlipayTradeServiceImpl;
 import com.alipay.demo.trade.utils.ZxingUtils;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
+import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.stereotype.Controller;
 import org.springframework.stereotype.Service;
 import vip.proyi.mmall.common.Const;
 import vip.proyi.mmall.common.ServerResponse;
-import vip.proyi.mmall.dao.OrderItemMapper;
-import vip.proyi.mmall.dao.OrderMapper;
-import vip.proyi.mmall.dao.PayInfoMapper;
-import vip.proyi.mmall.pojo.Order;
-import vip.proyi.mmall.pojo.OrderItem;
-import vip.proyi.mmall.pojo.PayInfo;
+import vip.proyi.mmall.dao.*;
+import vip.proyi.mmall.pojo.*;
 import vip.proyi.mmall.service.IOrderService;
 import vip.proyi.mmall.util.BigDecimalUtil;
 import vip.proyi.mmall.util.DateTimeUtil;
@@ -45,6 +44,7 @@ import vip.proyi.mmall.util.PropertiesUtil;
 import javax.servlet.Servlet;
 import java.io.File;
 import java.io.IOException;
+import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -64,6 +64,110 @@ public class OrderServiceImpl implements IOrderService {
     private OrderItemMapper orderItemMapper;
     @Autowired
     private PayInfoMapper payInfoMapper;
+    @Autowired
+    private CartMapper cartMapper;
+    @Autowired
+    private ProductMapper productMapper;
+
+    /**
+    * 新建订单
+    * @param
+    * @return
+    */
+    public ServerResponse createOrder(Integer userId, Integer shippingId) {
+        // 从购物车中获取数据
+        List<Cart> cartList = cartMapper.selectCheckedCartByUserId(userId);
+        // 计算订单的总价
+        ServerResponse serverResponse = this.getCartOrderItem(userId, cartList);
+        List<OrderItem> orderItemList = (List<OrderItem>) serverResponse.getData();
+        BigDecimal payment = this.getOrderTotalPrice(orderItemList);
+
+        // 生成订单
+    }
+
+    /**
+     * 生成订单信息
+     * @param userId
+     * @return
+     */
+    private Order assembOrder(Integer userId, Integer shippingId, BigDecimal payment) {
+        Order order = new Order();
+        long orderNo = this.generateOrderNo();
+        order.setOrderNo(orderNo);
+        order.setStatus(Const.OrderStatusEnum.NO_PAY.getCode());
+        //前期全场包邮，之后根据实际情况修改邮费信息
+        order.setPostage(0);
+        order.setPaymentType(Const.PaymentTypeEnum.ONLINE_PAY.getCode());
+        order.setPayment(payment);
+
+        order.setUserId(userId);
+        order.setShippingId(shippingId);
+
+        //在付款的时候再添加付款时间、发货的时候插入发货时间等
+        return null;
+    }
+
+    /**
+     * 生成订单号
+     * 订单号生成规则需要仔细规划，避免间接泄露某些信息（比如自增 就会泄露网站用户量等等）
+     * @return
+     */
+    private long generateOrderNo() {
+        // 此处规则设为时间戳取余
+        long currentTime = System.currentTimeMillis();
+        return currentTime + currentTime%9;
+
+    }
+
+    /**
+    * 计算订单金额
+    * @param orderItemList
+    * @return
+    */
+    private BigDecimal getOrderTotalPrice(List<OrderItem> orderItemList) {
+        // 使用BigDecimal的string构造器初始化
+        BigDecimal payment = new BigDecimal("0");
+        for (OrderItem orderItem : orderItemList) {
+            BigDecimalUtil.add(payment.doubleValue(), orderItem.getTotalPrice().doubleValue());
+        }
+        return payment;
+    }
+
+    /**
+     * 获取订单明细内容
+     * @param userId
+     * @param cartList
+     * @return
+     */
+    private ServerResponse getCartOrderItem(Integer userId, List<Cart> cartList) {
+        List<OrderItem> orderItemList = Lists.newArrayList();
+        if (CollectionUtils.isEmpty(cartList)) {
+            return ServerResponse.createByErrorMessage("购物车为空");
+        }
+        //校验购物车的数据，包括产品状态和数量
+        for (Cart cartItem : cartList) {
+            OrderItem orderItem = new OrderItem();
+            Product product = productMapper.selectByPrimaryKey(cartItem.getProductId());
+
+            if (Const.ProductStatusEnum.ON_SALE.getCode() != product.getStatus()) {
+                return ServerResponse.createByErrorMessage("产品" + product.getName() + "已不是销售状态");
+            }
+            //校验库存
+            if (cartItem.getQuantity() > product.getStock()) {
+                return ServerResponse.createByErrorMessage("产品" + product.getName() + "库存不足");
+            }
+
+            orderItem.setUserId(userId);
+            orderItem.setProductId(product.getId());
+            orderItem.setProductName(product.getName());
+            orderItem.setProductImage(product.getMainImage());
+            orderItem.setCurrentUnitPrice(product.getPrice());
+            orderItem.setQuantity(cartItem.getQuantity());
+            orderItem.setTotalPrice(BigDecimalUtil.mul(product.getPrice().doubleValue(), cartItem.getQuantity()));
+            orderItemList.add(orderItem);
+        }
+        return ServerResponse.createBySuccess(orderItemList);
+    }
 
     /**
     * 订单支付

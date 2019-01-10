@@ -14,6 +14,7 @@ import com.alipay.api.AlipayApiException;
 import com.alipay.api.internal.util.AlipaySignature;
 import com.alipay.demo.trade.config.Configs;
 import com.google.common.collect.Maps;
+import com.sun.org.apache.regexp.internal.RE;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -44,6 +45,22 @@ public class OrderController {
 
     @Autowired
     private IOrderService iOrderService;
+
+    /**
+    * 新建订单
+    * @param
+    * @return
+    */
+    @RequestMapping("create.do")
+    @ResponseBody
+    public ServerResponse create(HttpSession session, Integer shippingId) {
+        User user = (User) session.getAttribute(Const.CURRENT_USER);
+        if (user == null) {
+            return ServerResponse.createByErrorCodeMessage(ResponseCode.NEED_LOGIN.getCode(), ResponseCode.NEED_LOGIN.getDesc());
+        }
+        return null;
+    }
+
     /**
     * 支付订单
     * @param
