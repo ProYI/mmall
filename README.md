@@ -152,6 +152,7 @@ CREATE TABLE `mmall_shipping` (
   ![支付宝扫码支付流程](img_mmall/支付宝扫码支付流程.png)
 * 支付宝扫码支付重要的字段  
   **关键入参：**  
+
     |参数名称|参数说明|  
     |:-:|:-|  
     |out_trade_no|商户订单号，需要保证不重复|  
@@ -159,18 +160,21 @@ CREATE TABLE `mmall_shipping` (
     |subject|订单标题|
     |store_id|商户门店编号|
     |timeout_express|交易超时时间|  
-  **关键出参：**  
+  **关键出参：** 
+
     |参数名称|参数说明|  
     |:-:|:-|  
     |qr_code|订单二维码（有效时间2小时）的内容，开发者需要自己使用工具根据内容生成二维码图片|  
   
   **重要字段：**  
+
     |参数|参数名称|类型|必填|描述|范例|  
     |:-:|:-:|:-:|:-:|:-:|:-:|  
     |trade_status|交易状态|String(32)|否|交易目前所处的状态|TRADE_CLOSED|  
     |total_amount|订单金额|Number(9,2)|否|本次交易支付的订单金额，单位为人民币（元）|20|  
     |buyer_pay_amount|付款金额|Number(9,2)|否|用户在交易中支付的金额|13.88|  
   **交易状态说明：**  
+
     |枚举名称|枚举说明|  
     |:-:|:-|  
     |WAIT_BUYER_PAY|交易创建，等待买家付款|  
@@ -178,6 +182,7 @@ CREATE TABLE `mmall_shipping` (
     |TRADE_SUCCESS|交易支付成功|  
     |TRADE_FINISHED|交易结束，不可退款|  
   **通知触发条件：**  
+
     |触发条件名|触发条件描述|触发条件默认值|  
     |:-:|:-|:-|  
     |TRADE_FINISHED|交易完成|false（不触发通知）|  
@@ -185,6 +190,7 @@ CREATE TABLE `mmall_shipping` (
     |WAIT_BUYER_PAY|交易创建|false（不触发通知）|  
     |TRADE_CLOSED|交易关闭|false（不触发通知）|  
   **支付渠道说明：**  
+  
     |支付渠道代码|支付渠道|  
     |:-:|:-|  
     |ALIPAYACCOUNT|支付宝余额|  
@@ -209,3 +215,9 @@ CREATE TABLE `mmall_shipping` (
     - 2 及时关闭开放的dubug端口  
   * 内网穿透（ngrok、natapp、花生壳）  
 * 支付宝扫码支付官方Demo调试   
+## 订单模块  
+* 避免业务逻辑中横向越权和纵向越权等安全漏洞  
+* 设计实用、安全、扩展性强大的常量、枚举类  
+* 订单号生成规则、订单严谨性判断  
+* POJO和VO之间的实际操练  
+* mybatis批量插入  
